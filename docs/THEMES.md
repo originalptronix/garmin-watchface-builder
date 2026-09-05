@@ -1,38 +1,90 @@
-# Theme-System für Watchfaces
+# Theme-System: Architektur & Anleitung
 
-## Wichtig zu Rechten und Inhalten
+## Architekturübersicht
 
-Die Software soll unterschiedliche **Stile und Themenrichtungen** unterstützen, aber keine urheberrechtsverletzenden Inhalte oder beleidigenden/persönlich diffamierenden Vorlagen mitliefern. Statt exakter Marken- oder Personenmotive werden daher **inspirierte Themes** angeboten. [cite:4]
+```
+ThemeLoader          ← Wählt und speichert das aktive Theme
+    │
+    ├── ThemeDefinition   ← Value-Object mit allen visuellen Parametern
+    └── ThemeRenderer     ← Zeichnet Hintergrundstile auf den dc
 
-## Unterstützte Theme-Kategorien
+WatchfaceView
+    ├── ThemeLoader  (instanziiert, hält Referenz)
+    ├── ThemeRenderer
+    └── Komponenten (TimeDisplay, DateDisplay, ...)
+            └── alle erhalten ThemeLoader-Referenz
 
-### 1. Cartoon Retro
-Inspiriert von gelben Cartoon-Familien, mit kräftigen Farben, runden Formen und verspielter Typografie.
+ThemeSettingsDelegate
+    └── ThemeLoader.cycleNextTheme()  auf Tap
+```
 
-### 2. Nuclear Retro UI
-Inspiriert von postapokalyptischen Pip-Boy-/Terminal-Interfaces, mit grünem Monochrom-Look, Rasterlinien und Statusanzeigen.
+---
 
-### 3. Neon Crime City
-Inspiriert von Open-World-City-Games, mit dunklem Hintergrund, Neon-Akzenten, Karten-/HUD-Look und klaren Panels.
+## Verfügbare Themes
 
-### 4. Political Satire / Meme
-Nur als **benutzerdefinierbare Freitext- oder Farbschemavorlage**, ohne mitgelieferte diffamierende Aussagen, Personenbilder oder beleidigende Standardtexte.
+| ID | Name | Stil |
+|----|------|------|
+| 0 | Minimal Sport | Schwarz/Weiß, Cyan-Akzent, sportlich |
+| 1 | Cartoon Retro | Gelb/Rot, fett, verspielt |
+| 2 | Nuclear Terminal | Grün monochrom, Scanlines, Terminal-Look |
+| 3 | Neon City | Dunkel, Neon-Cyan, Nacht-Grid |
+| 4 | Custom | Frei definierbar via Application.Storage |
 
-## Empfehlung für die Software
+---
 
-Die App sollte statt fester Franchise-Namen ein **Template-System** anbieten:
+## Theme wechseln
 
-- `cartoon-retro`
-- `nuclear-terminal`
-- `neon-city`
-- `minimal-sport`
-- `analog-classic`
-- `custom`
+### Auf der Uhr
+- **Tap oben auf das Watchface** → nächstes Theme
+- **Long-Press** → Garmin-Settings → Theme-ID manuell setzen
 
-Damit kann der Nutzer eigene Farben, Hintergründe, Icons und Texte definieren, ohne dass das Projekt selbst problematische Inhalte ausliefert.
+### Via Garmin Connect App
+Settings → Watchface → Theme-ID (0-4) eingeben.
 
-## Geplante Architektur
+---
 
-- Theme-Definitionen als JSON-Dateien unter `themes/`
-- Platzhalter für Farben, Schriftgrößen, Widgets und Hintergrundstil
-- Optional später: Import eigener Assets durch den Nutzer
+## Neues Theme erstellen
+
+1. In `ThemeLoader.mc` eine neue `buildXxx()`-Funktion hinzufügen:
+
+```monkey-c
+private static function buildMyTheme() as ThemeDefinition {
+    var t = new ThemeDefinition("My Theme");
+    t.setBackground(0x0D0D0D);
+    t.setPrimaryColor(0xFF6B35);
+    t.setAccentColor(0xFFD700);
+    t.setMutedColor(0x888888);
+    t.setTimeStyle(ThemeDefinition.STYLE_DIGITAL_LARGE);
+    t.setBackgroundStyle(ThemeDefinition.BG_SOLID);
+    return t;
+}
+```
+
+2. Funktion in `buildRegistry()` eintragen:
+
+```monkey-c
+private static function buildRegistry() as Array<ThemeDefinition> {
+    return [
+        ThemeLoader.buildMinimalSport(),
+        ThemeLoader.buildCartoonRetro(),
+        ThemeLoader.buildNuclearTerminal(),
+        ThemeLoader.buildNeonCity(),
+        ThemeLoader.buildCustom(),
+        ThemeLoader.buildMyTheme()  // <-- neu
+    ];
+}
+```
+
+3. Build & Test im Simulator.
+
+---
+
+## Custom-Theme via Storage
+
+```monkey-c
+// Farben programmatisch setzen (z.B. aus Settings-Page)
+Application.Storage.setValue("customBg",      0x1A0000);
+Application.Storage.setValue("customPrimary",  0xFF4444);
+Application.Storage.setValue("customAccent",   0xFFAA00);
+Application.Storage.setValue("activeThemeId", 4); // Custom
+```

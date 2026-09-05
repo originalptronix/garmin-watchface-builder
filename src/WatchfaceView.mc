@@ -7,64 +7,73 @@ import Toybox.Time.Gregorian;
 
 /**
  * WatchfaceView
- * Haupt-View: Steuert das Rendering aller Watchface-Komponenten.
- * Unterstützte Geräte: Garmin Epix Pro Gen 2 (47mm / 51mm)
- * Displayauflösung: 416 x 416 px (AMOLED)
+ * Haupt-View: Orchestriert ThemeLoader, ThemeRenderer und alle Komponenten.
+ * Epix Pro Gen 2: 416x416 AMOLED
  */
 class WatchfaceView extends WatchUi.WatchFace {
 
-    private var _timeDisplay as TimeDisplay;
-    private var _dateDisplay as DateDisplay;
+    // Theme-System
+    private var _themeLoader   as ThemeLoader;
+    private var _themeRenderer as ThemeRenderer;
+
+    // Anzeigekomponenten
+    private var _timeDisplay      as TimeDisplay;
+    private var _dateDisplay      as DateDisplay;
     private var _heartRateDisplay as HeartRateDisplay;
-    private var _stepsDisplay as StepsDisplay;
-    private var _batteryDisplay as BatteryDisplay;
+    private var _stepsDisplay     as StepsDisplay;
+    private var _batteryDisplay   as BatteryDisplay;
 
     function initialize() {
         WatchFace.initialize();
-        _timeDisplay    = new TimeDisplay();
-        _dateDisplay    = new DateDisplay();
-        _heartRateDisplay = new HeartRateDisplay();
-        _stepsDisplay   = new StepsDisplay();
-        _batteryDisplay = new BatteryDisplay();
+
+        // Theme-System initialisieren
+        _themeLoader   = new ThemeLoader();
+        _themeRenderer = new ThemeRenderer(_themeLoader);
+
+        // Komponenten mit Theme-Zugriff initialisieren
+        _timeDisplay      = new TimeDisplay(_themeLoader);
+        _dateDisplay      = new DateDisplay(_themeLoader);
+        _heartRateDisplay = new HeartRateDisplay(_themeLoader);
+        _stepsDisplay     = new StepsDisplay(_themeLoader);
+        _batteryDisplay   = new BatteryDisplay(_themeLoader);
     }
 
-    // Layout bei Größenänderung / Initialisierung
     function onLayout(dc as Graphics.Dc) as Void {
         setLayout(Rez.Layouts.WatchFace(dc));
     }
 
-    // Sichtbarkeit: Watchface wird angezeigt
-    function onShow() as Void {
-    }
+    function onShow() as Void {}
 
-    // Hauptrender-Methode (wird jede Minute aufgerufen)
+    // Haupt-Render (jede Minute)
     function onUpdate(dc as Graphics.Dc) as Void {
-        // Hintergrund schwarz (optimiert für AMOLED)
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
-        dc.clear();
+        // 1. Theme-Hintergrund zeichnen
+        _themeRenderer.drawBackground(dc);
 
-        // Alle Komponenten zeichnen
+        // 2. Alle Komponenten rendern
         _timeDisplay.draw(dc);
         _dateDisplay.draw(dc);
         _heartRateDisplay.draw(dc);
         _stepsDisplay.draw(dc);
         _batteryDisplay.draw(dc);
+
+        // 3. Theme-Name einblenden (optional, nur kurz nach Wechsel)
+        drawThemeLabel(dc);
     }
 
-    // Inaktivitäts-Modus (always-on display)
+    // Always-On Display
     function onPartialUpdate(dc as Graphics.Dc) as Void {
         _timeDisplay.draw(dc);
     }
 
-    // Watchface wird verborgen
-    function onHide() as Void {
+    // Theme-Name kurz einblenden (nur wenn kein Sport-Theme aktiv)
+    private function drawThemeLabel(dc as Graphics.Dc) as Void {
+        var theme = _themeLoader.getTheme();
+        dc.setColor(theme.getMutedColor(), Graphics.COLOR_TRANSPARENT);
+        dc.drawText(208, 380, Graphics.FONT_XTINY, theme.getName(), Graphics.TEXT_JUSTIFY_CENTER);
     }
 
-    // Hintergrundaktualisierung (außerhalb des Watchface-Modus)
-    function onExitSleep() as Void {
-    }
-
-    function onEnterSleep() as Void {
-    }
+    function onHide()       as Void {}
+    function onExitSleep()  as Void {}
+    function onEnterSleep() as Void {}
 
 }

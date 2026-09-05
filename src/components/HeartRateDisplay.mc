@@ -4,44 +4,37 @@ import Toybox.Lang;
 
 /**
  * HeartRateDisplay
- * Zeigt die aktuelle Herzfrequenz an.
- * Farbcodierung nach Pulszonen (optional konfigurierbar).
+ * Herzfrequenz mit theme-abhaengiger Farbgebung.
+ * Pulszonen-Farben bleiben erhalten, werden aber am Theme gespiegelt.
  */
 class HeartRateDisplay {
 
-    // Position: unten links
     private const POS_X = 80;
-    private const POS_Y = 340;
+    private const POS_Y = 345;
 
-    // Pulszonen-Farben
+    private var _loader as ThemeLoader;
+
     private const ZONE_COLORS = [
-        0x4CAF50, // Zone 1: Grün  (< 115)
-        0x8BC34A, // Zone 2: Hellgrün (115-135)
-        0xFFC107, // Zone 3: Gelb  (135-155)
-        0xFF9800, // Zone 4: Orange (155-175)
-        0xF44336  // Zone 5: Rot   (> 175)
+        0x4CAF50, 0x8BC34A, 0xFFC107, 0xFF9800, 0xF44336
     ];
 
-    function initialize() {
+    function initialize(loader as ThemeLoader) {
+        _loader = loader;
     }
 
     function draw(dc as Graphics.Dc) as Void {
-        var activityInfo = Activity.getActivityInfo();
-        var hrValue = "--";
-        var color = 0xAAAAAA;
+        var info  = Activity.getActivityInfo();
+        var hrStr = "--";
+        var color = _loader.getTheme().getMutedColor();
 
-        if (activityInfo != null && activityInfo.currentHeartRate != null) {
-            var hr = activityInfo.currentHeartRate;
-            hrValue = hr.toString();
-            color = getZoneColor(hr);
+        if (info != null && info.currentHeartRate != null) {
+            var hr = info.currentHeartRate;
+            hrStr  = hr.toString();
+            color  = getZoneColor(hr);
         }
 
-        // Herzfrequenz-Icon (♥)
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(POS_X - 18, POS_Y, Graphics.FONT_SMALL, "♥", Graphics.TEXT_JUSTIFY_CENTER);
-
-        // Wert
-        dc.drawText(POS_X + 10, POS_Y, Graphics.FONT_MEDIUM, hrValue, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(POS_X, POS_Y, Graphics.FONT_SMALL, "♥ " + hrStr, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
     private function getZoneColor(hr as Number) as Number {

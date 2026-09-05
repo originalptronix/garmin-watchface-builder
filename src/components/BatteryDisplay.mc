@@ -4,34 +4,31 @@ import Toybox.Lang;
 
 /**
  * BatteryDisplay
- * Zeigt den Akkustand in Prozent an.
- * Farbcodierung: Grün > 50%, Gelb > 20%, Rot <= 20%
+ * Batteriestatus mit theme-bewusster Farbgebung.
  */
 class BatteryDisplay {
 
-    // Position: oben rechts
     private const POS_X = 370;
     private const POS_Y = 20;
 
-    function initialize() {
+    private var _loader as ThemeLoader;
+
+    function initialize(loader as ThemeLoader) {
+        _loader = loader;
     }
 
     function draw(dc as Graphics.Dc) as Void {
-        var stats = System.getSystemStats();
+        var stats   = System.getSystemStats();
         var battery = stats.battery.toNumber();
-        var batteryString = battery.toString() + "%";
+        var batStr  = battery.toString() + "%";
 
         var color;
-        if (battery > 50) {
-            color = 0x4CAF50; // Grün
-        } else if (battery > 20) {
-            color = 0xFFC107; // Gelb
-        } else {
-            color = 0xF44336; // Rot (kritisch)
-        }
+        if (battery > 50)      { color = 0x4CAF50; }
+        else if (battery > 20) { color = 0xFFC107; }
+        else                   { color = 0xF44336; }
 
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(POS_X, POS_Y, Graphics.FONT_XTINY, batteryString, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(POS_X, POS_Y, Graphics.FONT_XTINY, batStr, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
 }
