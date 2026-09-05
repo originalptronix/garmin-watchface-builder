@@ -1,0 +1,18 @@
+{
+  "id": "cartoon-retro",
+  "name": "Cartoon Retro",
+  "description": "Bunte, verspielte Retro-Cartoon-Optik mit kräftigen Primärfarben.",
+  "theme": {
+    "backgroundColor": "0xFFD54F",
+    "primaryColor": "0x1A1A1A",
+    "accentColor": "0xE53935",
+    "mutedColor": "0x5D4037"
+  },
+  "widgets": {
+    "timeStyle": "bold-rounded",
+    "dateStyle": "compact",
+    "heartRateStyle": "badge",
+    "stepsStyle": "bubble"
+  },
+  "backgroundStyle": "flat-cartoon"
+}

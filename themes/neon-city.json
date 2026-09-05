@@ -1,0 +1,18 @@
+{
+  "id": "neon-city",
+  "name": "Neon City",
+  "description": "Dunkles Nacht-Theme mit Neon-Akzenten und HUD-Feeling.",
+  "theme": {
+    "backgroundColor": "0x05070D",
+    "primaryColor": "0xF5F7FF",
+    "accentColor": "0x00E5FF",
+    "mutedColor": "0x7B8AA0"
+  },
+  "widgets": {
+    "timeStyle": "digital-wide",
+    "dateStyle": "panel",
+    "heartRateStyle": "neon-pulse",
+    "stepsStyle": "hud-box"
+  },
+  "backgroundStyle": "grid-night"
+}

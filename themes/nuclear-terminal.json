@@ -1,0 +1,18 @@
+{
+  "id": "nuclear-terminal",
+  "name": "Nuclear Terminal",
+  "description": "Monochromes Retro-Terminal-Theme mit grünem HUD-Look.",
+  "theme": {
+    "backgroundColor": "0x000000",
+    "primaryColor": "0x7CFF7C",
+    "accentColor": "0x3CB043",
+    "mutedColor": "0x4E9A51"
+  },
+  "widgets": {
+    "timeStyle": "terminal-large",
+    "dateStyle": "mono",
+    "heartRateStyle": "line",
+    "stepsStyle": "counter"
+  },
+  "backgroundStyle": "scanline"
+}
