@@ -1,0 +1,20 @@
+# Connect IQ Build-Artefakte
+bin/
+*.prg
+*.prg.debug
+*.iq
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# SDK Cache
+.cache/

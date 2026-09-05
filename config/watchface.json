@@ -1,0 +1,46 @@
+{
+  "_comment": "Konfigurationsdatei für den Garmin Epix Pro Gen 2 Watchface Builder",
+  "version": "1.0.0",
+  "layout": "sport",
+  "theme": {
+    "backgroundColor": "0x000000",
+    "primaryColor": "0xFFFFFF",
+    "accentColor": "0x00B4D8",
+    "mutedColor": "0xAAAAAA"
+  },
+  "components": {
+    "time": {
+      "enabled": true,
+      "format": "24h",
+      "position": { "x": 208, "y": 190 },
+      "font": "FONT_NUMBER_THAI_HOT"
+    },
+    "date": {
+      "enabled": true,
+      "position": { "x": 208, "y": 295 },
+      "showWeekday": true,
+      "locale": "de"
+    },
+    "heartRate": {
+      "enabled": true,
+      "position": { "x": 80, "y": 340 },
+      "showZoneColors": true,
+      "zones": [115, 135, 155, 175]
+    },
+    "steps": {
+      "enabled": true,
+      "position": { "x": 336, "y": 340 },
+      "dailyGoal": 10000
+    },
+    "battery": {
+      "enabled": true,
+      "position": { "x": 370, "y": 20 },
+      "showPercentage": true,
+      "thresholds": { "low": 20, "critical": 10 }
+    },
+    "weather": {
+      "enabled": false,
+      "position": { "x": 208, "y": 60 }
+    }
+  }
+}

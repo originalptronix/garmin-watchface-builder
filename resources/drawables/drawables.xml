@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<drawables xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../../../schema/drawables.xsd">
+  <!-- Launcher Icon wird hier referenziert -->
+  <!-- <bitmap id="LauncherIcon" filename="launcher_icon.png" /> -->
+</drawables>

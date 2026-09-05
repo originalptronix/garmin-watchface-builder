@@ -1,0 +1,15 @@
+project.manifest = manifest.xml
+
+# Basis-Quellcode für alle Geräte
+base.sourcePath = src
+base.resourcePath = resources
+
+# Spezifische Build-Konfigurationen
+epixpro2.sourcePath = $(base.sourcePath)
+epixpro2.resourcePath = $(base.resourcePath)
+
+epixpro2size47.sourcePath = $(base.sourcePath)
+epixpro2size47.resourcePath = $(base.resourcePath)
+
+epixpro2size51.sourcePath = $(base.sourcePath)
+epixpro2size51.resourcePath = $(base.resourcePath)

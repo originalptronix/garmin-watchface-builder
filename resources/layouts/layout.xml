@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<layouts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../../../schema/layouts.xsd">
+
+  <!-- Epix Pro Gen 2: 416x416 AMOLED -->
+  <layout id="WatchFace">
+    <!-- Leer: Rendering erfolgt komplett in WatchfaceView.mc über dc-Calls -->
+  </layout>
+
+</layouts>
