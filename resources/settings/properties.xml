@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../../../schema/properties.xsd">
+
+  <!-- Aktives Theme (0=Minimal Sport, 1=Cartoon Retro, 2=Nuclear Terminal, 3=Neon City, 4=Custom) -->
+  <property id="activeThemeId" type="Number">0</property>
+
+  <!-- Custom-Theme Farben (als 24-bit Integer: 0xRRGGBB) -->
+  <property id="customBg"      type="Number">0</property>
+  <property id="customPrimary" type="Number">16777215</property>
+  <property id="customAccent"  type="Number">44240</property>
+
+  <!-- Optionen -->
+  <property id="showThemeLabel"   type="Boolean">true</property>
+  <property id="use24hFormat"     type="Boolean">true</property>
+  <property id="showHeartRate"    type="Boolean">true</property>
+  <property id="showSteps"        type="Boolean">true</property>
+  <property id="showBattery"      type="Boolean">true</property>
+
+</properties>

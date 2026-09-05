@@ -1,86 +1,117 @@
 # Garmin Watchface Builder
 
-> Ein Tool zum Erstellen eigener Watchfaces für die **Garmin Epix Pro Gen 2** mit Monkey C / Connect IQ SDK.
+> Ein Framework zum Erstellen und Wechseln eigener Watchfaces fuer die **Garmin Epix Pro Gen 2** mit Monkey C / Connect IQ SDK.
 
+[![CI](https://github.com/originalptronix/garmin-watchface-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/originalptronix/garmin-watchface-builder/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Connect IQ SDK](https://img.shields.io/badge/Connect_IQ-SDK_7.x-blue)](https://developer.garmin.com/connect-iq/overview/)
 ![Garmin Device](https://img.shields.io/badge/Device-Epix_Pro_Gen_2-green)
 
 ---
 
-## 🎯 Ziel
+## Ziel
 
-Dieses Projekt stellt ein Framework und Builder-Tool bereit, mit dem eigene Watchfaces für die Garmin Epix Pro Gen 2 erstellt, konfiguriert und auf die Uhr gespielt werden können. Unterstützt werden sowohl Anfänger (WYSIWYG-Konfiguration via JSON) als auch Fortgeschrittene (direktes Monkey C Coding).
-
----
-
-## 🧠 Theme-System
-
-Die Software unterstützt **mehrere Watchface-Stile** über ein Template-System statt fester urheberrechtlich problematischer Franchise-Vorlagen.
-
-### Mitgelieferte Beispiel-Themes
-
-| Theme-ID | Stilrichtung |
-|----------|--------------|
-| `cartoon-retro` | Bunt, verspielt, cartoonartig |
-| `nuclear-terminal` | Monochromer Retro-HUD / Terminal-Look |
-| `neon-city` | Dunkel, neonartig, urbaner HUD-Stil |
-| `minimal-sport` | Sportlich und datenfokussiert |
-| `custom` | Vollständig benutzerdefiniert |
-
-Weitere Details: siehe `docs/THEMES.md`
+Dieses Projekt stellt ein vollstaendiges Framework bereit, mit dem **mehrere unterschiedliche Watchface-Themes** erstellt, konfiguriert und per Tap oder Garmin Connect App gewechselt werden koennen.
 
 ---
 
-## 🛠 Voraussetzungen
+## Themes
+
+| ID | Name | Stil |
+|----|------|------|
+| 0 | Minimal Sport | Schwarz/Weiss, Cyan-Akzent, sportlich |
+| 1 | Cartoon Retro | Gelb/Rot, fett, verspielt |
+| 2 | Nuclear Terminal | Gruen monochrom, Scanlines, Terminal-Look |
+| 3 | Neon City | Dunkel, Neon-Cyan, Nacht-Grid |
+| 4 | Custom | Frei definierbar ueber Garmin Connect App |
+
+**Theme wechseln:** Tap auf das obere Display-Drittel oder in der Garmin Connect App unter Einstellungen.
+
+---
+
+## Voraussetzungen
 
 | Tool | Version | Link |
 |------|---------|------|
 | Connect IQ SDK | 7.x | [Download](https://developer.garmin.com/connect-iq/sdk/) |
 | Visual Studio Code | beliebig | [Download](https://code.visualstudio.com/) |
-| Monkey C Extension (VSCode) | aktuell | [Marketplace](https://marketplace.visualstudio.com/items?itemName=garmin.monkey-c) |
-| Java JDK | 11+ | Für den Simulator benötigt |
+| Monkey C Extension | aktuell | [Marketplace](https://marketplace.visualstudio.com/items?itemName=garmin.monkey-c) |
+| Java JDK | 17+ | Fuer den Simulator benoetigt |
 
 ---
 
-## 📁 Projektstruktur
-
-```
-garmin-watchface-builder/
-├── src/
-├── resources/
-├── config/
-├── themes/                       # Theme-Vorlagen als JSON
-├── docs/
-│   ├── SETUP.md
-│   ├── CUSTOMIZATION.md
-│   └── THEMES.md
-├── manifest.xml
-├── monkey.jungle
-└── README.md
-```
-
----
-
-## 🚀 Schnellstart
-
-### 1. Repository klonen
+## Schnellstart
 
 ```bash
 git clone https://github.com/originalptronix/garmin-watchface-builder.git
 cd garmin-watchface-builder
-```
-
-### 2. Connect IQ SDK einrichten
-
-Installiere den Connect IQ SDK Manager und lade das SDK für die **Epix Pro Gen 2** herunter.
-
-### 3. In VSCode öffnen
-
-```bash
 code .
+# Ctrl+Shift+P -> Monkey C: Build and Run -> epixpro2
 ```
 
-### 4. Simulator starten
+---
 
-In VSCode: `Ctrl+Shift+P` → **Monkey C: Build and Run** → Gerät **epixpro2** wählen.
+## Projektstruktur
+
+```
+garmin-watchface-builder/
++-- src/
+|   +-- WatchfaceApp.mc
+|   +-- WatchfaceView.mc
+|   +-- theme/
+|   |   +-- ThemeLoader.mc        # Theme laden, wechseln, persistieren
+|   |   +-- ThemeDefinition.mc    # Value-Object: Farben + Stile
+|   |   +-- ThemeRenderer.mc      # Hintergrunddrawing
+|   +-- components/
+|   |   +-- TimeDisplay.mc
+|   |   +-- DateDisplay.mc
+|   |   +-- HeartRateDisplay.mc
+|   |   +-- StepsDisplay.mc
+|   |   +-- BatteryDisplay.mc
+|   |   +-- WeatherDisplay.mc
+|   +-- settings/
+|       +-- SettingsLoader.mc     # Connect IQ Properties lesen
+|       +-- ThemeSettingsDelegate.mc
++-- resources/
+|   +-- settings/
+|   |   +-- settings.xml          # Garmin Connect Einstellungsseite
+|   |   +-- properties.xml        # Property-Defaults
+|   +-- strings/strings.xml
+|   +-- layouts/layout.xml
++-- themes/                       # JSON-Referenzdateien
++-- config/watchface.json
++-- .github/
+|   +-- workflows/
+|   |   +-- ci.yml                # Build + Lint bei jedem Push
+|   |   +-- release.yml           # Release bei git tag
+|   +-- SECRETS.md
++-- docs/
+|   +-- SETUP.md
+|   +-- CUSTOMIZATION.md
+|   +-- THEMES.md
+|   +-- CI_CD.md
++-- manifest.xml
++-- monkey.jungle
++-- LICENSE
+```
+
+---
+
+## CI/CD
+
+- **Push auf `main`**: Automatischer Build + Typecheck
+- **`git tag v1.x.x`**: Automatischer Release mit `.prg` und `.iq` Datei
+
+Details: [docs/CI_CD.md](docs/CI_CD.md)
+
+---
+
+## Eigenes Theme erstellen
+
+Details: [docs/THEMES.md](docs/THEMES.md)
+
+---
+
+## Lizenz
+
+MIT License

@@ -1,5 +1,26 @@
 <?xml version="1.0"?>
 <strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="../../../schema/strings.xsd">
+
+  <!-- App -->
   <string id="AppName">Watchface Builder</string>
+
+  <!-- Settings-Titel -->
+  <string id="SettingThemeTitle">Watchface Theme</string>
+  <string id="Setting24h">24h Zeitformat</string>
+  <string id="SettingHeartRate">Herzfrequenz anzeigen</string>
+  <string id="SettingSteps">Schritte anzeigen</string>
+  <string id="SettingBattery">Akku anzeigen</string>
+  <string id="SettingThemeLabel">Theme-Name einblenden</string>
+  <string id="SettingCustomBg">Custom: Hintergrundfarbe</string>
+  <string id="SettingCustomPrimary">Custom: Hauptfarbe</string>
+  <string id="SettingCustomAccent">Custom: Akzentfarbe</string>
+
+  <!-- Theme-Namen -->
+  <string id="ThemeMinimalSport">Minimal Sport</string>
+  <string id="ThemeCartoonRetro">Cartoon Retro</string>
+  <string id="ThemeNuclearTerminal">Nuclear Terminal</string>
+  <string id="ThemeNeonCity">Neon City</string>
+  <string id="ThemeCustom">Custom</string>
+
 </strings>

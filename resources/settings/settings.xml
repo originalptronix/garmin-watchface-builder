@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../../../schema/settings.xsd">
+
+  <!-- ================================================ -->
+  <!-- Theme-Auswahl -->
+  <!-- ================================================ -->
+  <setting propertyKey="@Properties.activeThemeId" title="@Strings.SettingThemeTitle">
+    <settingConfig type="list">
+      <listEntry value="0">@Strings.ThemeMinimalSport</listEntry>
+      <listEntry value="1">@Strings.ThemeCartoonRetro</listEntry>
+      <listEntry value="2">@Strings.ThemeNuclearTerminal</listEntry>
+      <listEntry value="3">@Strings.ThemeNeonCity</listEntry>
+      <listEntry value="4">@Strings.ThemeCustom</listEntry>
+    </settingConfig>
+  </setting>
+
+  <!-- ================================================ -->
+  <!-- Anzeige-Optionen -->
+  <!-- ================================================ -->
+  <setting propertyKey="@Properties.use24hFormat" title="@Strings.Setting24h">
+    <settingConfig type="toggle" />
+  </setting>
+
+  <setting propertyKey="@Properties.showHeartRate" title="@Strings.SettingHeartRate">
+    <settingConfig type="toggle" />
+  </setting>
+
+  <setting propertyKey="@Properties.showSteps" title="@Strings.SettingSteps">
+    <settingConfig type="toggle" />
+  </setting>
+
+  <setting propertyKey="@Properties.showBattery" title="@Strings.SettingBattery">
+    <settingConfig type="toggle" />
+  </setting>
+
+  <setting propertyKey="@Properties.showThemeLabel" title="@Strings.SettingThemeLabel">
+    <settingConfig type="toggle" />
+  </setting>
+
+  <!-- ================================================ -->
+  <!-- Custom Theme Farben -->
+  <!-- ================================================ -->
+  <setting propertyKey="@Properties.customBg" title="@Strings.SettingCustomBg">
+    <settingConfig type="numeric" min="0" max="16777215" />
+  </setting>
+
+  <setting propertyKey="@Properties.customPrimary" title="@Strings.SettingCustomPrimary">
+    <settingConfig type="numeric" min="0" max="16777215" />
+  </setting>
+
+  <setting propertyKey="@Properties.customAccent" title="@Strings.SettingCustomAccent">
+    <settingConfig type="numeric" min="0" max="16777215" />
+  </setting>
+
+</settings>

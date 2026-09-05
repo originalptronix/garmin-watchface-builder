@@ -1,14 +1,11 @@
+import Toybox.Application;
 import Toybox.WatchUi;
 import Toybox.Lang;
 
 /**
  * ThemeSettingsDelegate
- * Input-Delegate fuer das Watchface-Settings-Menue.
- * Ermoeglicht Theme-Wechsel per Swipe/Tap auf der Uhr.
- *
- * Verwendung:
- *   - Langer Druck auf das Watchface oeffnet das Garmin-Settings-Menue
- *   - Alternativ: onTap() ermoeglicht direktes Durchschalten
+ * Verarbeitet Tap-Events auf dem Watchface und Settings-Aenderungen
+ * aus der Garmin Connect App.
  */
 class ThemeSettingsDelegate extends WatchUi.WatchFaceDelegate {
 
@@ -19,9 +16,8 @@ class ThemeSettingsDelegate extends WatchUi.WatchFaceDelegate {
         _loader = loader;
     }
 
-    // Tap: Theme zyklisch wechseln
+    // Tap oben auf dem Display -> naechstes Theme
     function onTap(tapEvent as WatchUi.ClickEvent) as Boolean {
-        // Nur im vorderen Bereich (obere Haelfte) auf Tap reagieren
         var coords = tapEvent.getCoordinates();
         if (coords[1] < 100) {
             _loader.cycleNextTheme();
@@ -31,14 +27,9 @@ class ThemeSettingsDelegate extends WatchUi.WatchFaceDelegate {
         return false;
     }
 
-    // Garmin-Settings-Seite aufrufen (Connect IQ Settings)
+    // Wird aufgerufen wenn Nutzer Settings in Garmin Connect aendert
     function onSettingsChanged() as Void {
-        // Wird aufgerufen wenn Nutzer Settings ueber Garmin Connect aendert
-        // ThemeLoader laedt dann den neuen Wert aus Application.Storage
-        var savedId = Application.Storage.getValue("activeThemeId");
-        if (savedId != null) {
-            _loader.setTheme(savedId);
-        }
+        _loader.reloadFromProperties();
         WatchUi.requestUpdate();
     }
 

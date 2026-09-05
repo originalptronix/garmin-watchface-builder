@@ -4,111 +4,97 @@ import Toybox.Lang;
 
 /**
  * ThemeLoader
- * Zentrale Klasse zum Laden und Bereitstellen von Theme-Definitionen.
- * Themes werden als Application-Properties gespeichert und geladen.
+ * Laedt das aktive Theme aus Connect IQ Properties (settings.xml)
+ * oder aus Application.Storage (Tap-Wechsel auf der Uhr).
+ * Properties haben Vorrang (Garmin Connect App Setting).
  *
- * Verfügbare Theme-IDs:
- *   0 = minimal-sport      (Standard)
- *   1 = cartoon-retro
- *   2 = nuclear-terminal
- *   3 = neon-city
- *   4 = custom
+ * Theme-IDs:
+ *   0 = Minimal Sport
+ *   1 = Cartoon Retro
+ *   2 = Nuclear Terminal
+ *   3 = Neon City
+ *   4 = Custom
  */
 class ThemeLoader {
 
-    // Theme-Index der aktuell aktiven Definition
     private var _activeThemeId as Number;
-    private var _theme as ThemeDefinition;
-
-    // Statische Registry aller verfügbaren Themes
-    private static var _themeRegistry as Array<ThemeDefinition>;
+    private var _theme         as ThemeDefinition;
+    private var _registry      as Array<ThemeDefinition>;
 
     function initialize() {
-        _themeRegistry = ThemeLoader.buildRegistry();
+        _registry = buildRegistry();
 
-        // Gespeichertes Theme aus den App-Properties laden (bleibt nach Neustart)
-        var saved = Application.Storage.getValue("activeThemeId");
-        _activeThemeId = (saved != null) ? saved : 0;
-        _theme = _themeRegistry[_activeThemeId];
+        // Properties (Garmin Connect) haben Vorrang vor lokalem Storage
+        var propId = SettingsLoader.getActiveThemeId();
+        _activeThemeId = propId;
+        _theme = _registry[_activeThemeId];
     }
 
-    // Aktuell aktives Theme-Objekt zurückgeben
     function getTheme() as ThemeDefinition {
         return _theme;
     }
 
-    // Theme wechseln und persistent speichern
     function setTheme(themeId as Number) as Void {
-        if (themeId < 0 || themeId >= _themeRegistry.size()) {
-            return; // Ungültige ID ignorieren
-        }
+        if (themeId < 0 || themeId >= _registry.size()) { return; }
         _activeThemeId = themeId;
-        _theme = _themeRegistry[themeId];
+        _theme = _registry[themeId];
+        // In Storage persistieren (fuer Tap-Wechsel)
         Application.Storage.setValue("activeThemeId", themeId);
     }
 
-    // Zum nächsten Theme rotieren (für Tap-to-Switch)
     function cycleNextTheme() as Void {
-        var next = (_activeThemeId + 1) % _themeRegistry.size();
-        setTheme(next);
+        setTheme((_activeThemeId + 1) % _registry.size());
     }
 
-    // Anzahl verfügbarer Themes
-    function getThemeCount() as Number {
-        return _themeRegistry.size();
-    }
+    function getThemeCount()    as Number { return _registry.size(); }
+    function getActiveThemeId() as Number { return _activeThemeId; }
+    function getActiveThemeName() as String { return _theme.getName(); }
 
-    // ID des aktiven Themes
-    function getActiveThemeId() as Number {
-        return _activeThemeId;
-    }
-
-    // Name des aktiven Themes (für Settings-Anzeige)
-    function getActiveThemeName() as String {
-        return _theme.getName();
+    // Neuaufbau wenn Settings sich aendern (onSettingsChanged)
+    function reloadFromProperties() as Void {
+        _registry = buildRegistry(); // Custom-Farben neu lesen
+        var propId = SettingsLoader.getActiveThemeId();
+        _activeThemeId = propId;
+        _theme = _registry[propId];
     }
 
     // -------------------------------------------------------
-    // Registry: Alle Theme-Definitionen registrieren
-    // -------------------------------------------------------
-    private static function buildRegistry() as Array<ThemeDefinition> {
+    private function buildRegistry() as Array<ThemeDefinition> {
         return [
-            ThemeLoader.buildMinimalSport(),
-            ThemeLoader.buildCartoonRetro(),
-            ThemeLoader.buildNuclearTerminal(),
-            ThemeLoader.buildNeonCity(),
-            ThemeLoader.buildCustom()
+            buildMinimalSport(),
+            buildCartoonRetro(),
+            buildNuclearTerminal(),
+            buildNeonCity(),
+            buildCustom()
         ];
     }
 
-    // --- Theme-Definitionen ---
-
-    private static function buildMinimalSport() as ThemeDefinition {
+    private function buildMinimalSport() as ThemeDefinition {
         var t = new ThemeDefinition("Minimal Sport");
         t.setBackground(Graphics.COLOR_BLACK);
         t.setPrimaryColor(Graphics.COLOR_WHITE);
-        t.setAccentColor(0x00B4D8);   // Cyan
+        t.setAccentColor(0x00B4D8);
         t.setMutedColor(0xAAAAAA);
         t.setTimeStyle(ThemeDefinition.STYLE_DIGITAL_LARGE);
         t.setBackgroundStyle(ThemeDefinition.BG_SOLID);
         return t;
     }
 
-    private static function buildCartoonRetro() as ThemeDefinition {
+    private function buildCartoonRetro() as ThemeDefinition {
         var t = new ThemeDefinition("Cartoon Retro");
-        t.setBackground(0xFFD54F);     // Gelb
-        t.setPrimaryColor(0x1A1A1A);  // Fast schwarz
-        t.setAccentColor(0xE53935);   // Kräftiges Rot
-        t.setMutedColor(0x5D4037);    // Braun
+        t.setBackground(0xFFD54F);
+        t.setPrimaryColor(0x1A1A1A);
+        t.setAccentColor(0xE53935);
+        t.setMutedColor(0x5D4037);
         t.setTimeStyle(ThemeDefinition.STYLE_BOLD_ROUNDED);
         t.setBackgroundStyle(ThemeDefinition.BG_FLAT_CARTOON);
         return t;
     }
 
-    private static function buildNuclearTerminal() as ThemeDefinition {
+    private function buildNuclearTerminal() as ThemeDefinition {
         var t = new ThemeDefinition("Nuclear Terminal");
         t.setBackground(Graphics.COLOR_BLACK);
-        t.setPrimaryColor(0x7CFF7C);  // Terminal-Grün
+        t.setPrimaryColor(0x7CFF7C);
         t.setAccentColor(0x3CB043);
         t.setMutedColor(0x4E9A51);
         t.setTimeStyle(ThemeDefinition.STYLE_TERMINAL);
@@ -116,26 +102,23 @@ class ThemeLoader {
         return t;
     }
 
-    private static function buildNeonCity() as ThemeDefinition {
+    private function buildNeonCity() as ThemeDefinition {
         var t = new ThemeDefinition("Neon City");
-        t.setBackground(0x05070D);    // Fast schwarz
+        t.setBackground(0x05070D);
         t.setPrimaryColor(0xF5F7FF);
-        t.setAccentColor(0x00E5FF);   // Neon Cyan
+        t.setAccentColor(0x00E5FF);
         t.setMutedColor(0x7B8AA0);
         t.setTimeStyle(ThemeDefinition.STYLE_DIGITAL_WIDE);
         t.setBackgroundStyle(ThemeDefinition.BG_GRID_NIGHT);
         return t;
     }
 
-    private static function buildCustom() as ThemeDefinition {
+    private function buildCustom() as ThemeDefinition {
         var t = new ThemeDefinition("Custom");
-        // Custom-Werte aus Application.Storage laden
-        var bg  = Application.Storage.getValue("customBg");
-        var pri = Application.Storage.getValue("customPrimary");
-        var acc = Application.Storage.getValue("customAccent");
-        t.setBackground(bg  != null ? bg  : Graphics.COLOR_BLACK);
-        t.setPrimaryColor(pri != null ? pri : Graphics.COLOR_WHITE);
-        t.setAccentColor(acc != null ? acc : 0xFF8C00); // Orange als Default
+        // Farben direkt aus Connect IQ Properties lesen
+        t.setBackground(SettingsLoader.getCustomBg());
+        t.setPrimaryColor(SettingsLoader.getCustomPrimary());
+        t.setAccentColor(SettingsLoader.getCustomAccent());
         t.setMutedColor(0x888888);
         t.setTimeStyle(ThemeDefinition.STYLE_DIGITAL_LARGE);
         t.setBackgroundStyle(ThemeDefinition.BG_SOLID);
