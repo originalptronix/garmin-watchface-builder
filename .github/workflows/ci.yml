@@ -6,40 +6,67 @@ on:
   pull_request:
     branches: [ main ]
 
+# SDK-Version zentral pflegen
+env:
+  CIQ_SDK_VERSION: "7.4.3"
+
 jobs:
   build:
     name: Build Watchface (Epix Pro Gen 2)
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Code auschecken
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Java JDK installieren (Connect IQ SDK benoetigt Java)
       - name: Set up Java JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Connect IQ SDK herunterladen
-      - name: Download Connect IQ SDK
+      # Connect IQ SDK dynamisch ueber den offiziellen Manager herunterladen
+      - name: Install Connect IQ SDK
         run: |
-          mkdir -p $HOME/ciq-sdk
-          curl -L "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-7.4.3-2024-10-24-8e1b31a47.zip" \
-            -o /tmp/ciq-sdk.zip
-          unzip -q /tmp/ciq-sdk.zip -d $HOME/ciq-sdk
-          chmod +x $HOME/ciq-sdk/bin/monkeyc
-          echo "$HOME/ciq-sdk/bin" >> $GITHUB_PATH
+          # SDK Manager herunterladen
+          curl -L "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-manager-linux.zip" \
+            -o /tmp/sdk-manager.zip
 
-      # 4. Entwickler-Schluessel aus GitHub Secret wiederherstellen
+          # Pruefen ob wirklich ein ZIP angekommen ist
+          file /tmp/sdk-manager.zip | grep -q 'Zip archive' || {
+            echo "ERROR: SDK Manager Download ist kein ZIP."
+            echo "HTTP-Response-Inhalt:"
+            cat /tmp/sdk-manager.zip
+            exit 1
+          }
+
+          mkdir -p $HOME/ciq-manager
+          unzip -q /tmp/sdk-manager.zip -d $HOME/ciq-manager
+          chmod +x $HOME/ciq-manager/bin/sdkmanager
+
+          # SDK installieren (non-interactive)
+          $HOME/ciq-manager/bin/sdkmanager \
+            --sdk-install $CIQ_SDK_VERSION \
+            --install-dir $HOME/ciq-sdk \
+            --non-interactive
+
+          echo "$HOME/ciq-sdk/$CIQ_SDK_VERSION/bin" >> $GITHUB_PATH
+
+      - name: Verify monkeyc installation
+        run: monkeyc --version
+
       - name: Restore developer key
         run: |
           mkdir -p $HOME/.garmin
           echo "${{ secrets.GARMIN_DEVELOPER_KEY }}" | base64 -d > $HOME/.garmin/developer_key.der
+          # Sicherstellen dass die DER-Datei gueltig ist
+          openssl pkcs8 -inform DER -in $HOME/.garmin/developer_key.der -nocrypt -out /dev/null 2>&1 \
+            && echo "Developer Key OK" \
+            || { echo "ERROR: Developer Key ist unguelig oder korrupt"; exit 1; }
 
-      # 5. Build fuer Epix Pro Gen 2
+      - name: Create output directory
+        run: mkdir -p bin
+
       - name: Build for epixpro2
         run: |
           monkeyc \
@@ -49,7 +76,6 @@ jobs:
             -d epixpro2 \
             -t Release
 
-      # 6. Build-Artefakt hochladen
       - name: Upload .prg artifact
         uses: actions/upload-artifact@v4
         with:
@@ -58,7 +84,7 @@ jobs:
           retention-days: 14
 
   lint:
-    name: Monkey C Lint
+    name: Monkey C Typecheck
     runs-on: ubuntu-latest
     needs: build
 
@@ -72,22 +98,26 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download Connect IQ SDK
+      - name: Install Connect IQ SDK
         run: |
-          mkdir -p $HOME/ciq-sdk
-          curl -L "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-7.4.3-2024-10-24-8e1b31a47.zip" \
-            -o /tmp/ciq-sdk.zip
-          unzip -q /tmp/ciq-sdk.zip -d $HOME/ciq-sdk
-          chmod +x $HOME/ciq-sdk/bin/monkeyc
-          echo "$HOME/ciq-sdk/bin" >> $GITHUB_PATH
+          curl -L "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-manager-linux.zip" \
+            -o /tmp/sdk-manager.zip
+          file /tmp/sdk-manager.zip | grep -q 'Zip archive' || { cat /tmp/sdk-manager.zip; exit 1; }
+          mkdir -p $HOME/ciq-manager
+          unzip -q /tmp/sdk-manager.zip -d $HOME/ciq-manager
+          chmod +x $HOME/ciq-manager/bin/sdkmanager
+          $HOME/ciq-manager/bin/sdkmanager \
+            --sdk-install $CIQ_SDK_VERSION \
+            --install-dir $HOME/ciq-sdk \
+            --non-interactive
+          echo "$HOME/ciq-sdk/$CIQ_SDK_VERSION/bin" >> $GITHUB_PATH
 
       - name: Restore developer key
         run: |
           mkdir -p $HOME/.garmin
           echo "${{ secrets.GARMIN_DEVELOPER_KEY }}" | base64 -d > $HOME/.garmin/developer_key.der
 
-      # Monkey C Typcheck (kein Build, nur Analyse)
-      - name: Run Monkey C type checker
+      - name: Run Monkey C typecheck
         run: |
           monkeyc \
             -f monkey.jungle \
